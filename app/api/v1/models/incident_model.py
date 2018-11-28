@@ -36,3 +36,12 @@ class IncidentModel():
         }
         self.data.append(details)
         return self.data
+
+
+    def delete_record(self,id):
+        """This method deletes a record given the id"""
+
+        incident = [incident for incident in incidents
+                   if incident["id"] == id]    
+        incident.remove(incident[0])
+        return incident  

@@ -65,4 +65,33 @@ class SingleRecord(Resource, IncidentModel):
             "status": 200,
             "Data": resp            
          })
+
+
+     def delete(self,id):
+         """This method delete a record given the Id"""
+             
+         resp = self.db.get_single_record(id)
+
+         if len(resp)==0:
+             return jsonify({
+                 "message": "No record with this ID", 
+                 "status": 404})
+          
+         status = resp [0]['status']
+         id = resp [0]['id']
+
+         if status == "Draft":
+             resp = self.db.delete_record(id)
+             return jsonify({
+                 "Status": 200,
+                 "Data": [{
+                     "id": id,
+                     "Message": "Record deleted successfully"
+                 }]
+             })
+         return jsonify({
+             "Status": 400,
+             "Message": "Record can not be deleted"
+         })
+
     

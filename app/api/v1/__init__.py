@@ -8,4 +8,4 @@ version_one = Blueprint('api_v1',__name__,url_prefix='/api/v1/')
 api = Api(version_one)
 
 api.add_resource(Incident, 'incidents')
-api.add_resource(SingleRecord, 'incidents/<id>')
+api.add_resource(SingleRecord, 'incidents/<int:id>')
