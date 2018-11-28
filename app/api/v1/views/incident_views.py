@@ -21,6 +21,8 @@ class Incident(Resource ,IncidentModel):
             })
 
     def post(self):
+        """This method creates a new record"""
+
         details = request.get_json()
         createdBy = details['createdBy']
         record_type = details['type']
