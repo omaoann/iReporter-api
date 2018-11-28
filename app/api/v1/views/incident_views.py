@@ -20,6 +20,23 @@ class Incident(Resource ,IncidentModel):
             "Data": resp
             })
 
+    def post(self):
+        details = request.get_json()
+        createdBy = details['createdBy']
+        record_type = details['type']
+        location = details['location']
+        comment = details['comment']
+
+        resp = self.data.save(createdBy,record_type,location,comment)
+        id = resp[0]['id']
+        return jsonify({
+            "Status": 201,
+             "data":[{
+                  "id" : id,  
+                  "message": "created record Successfully"
+                 }]
+             })
+
 
 class SingleRecord(Resource, IncidentModel):
      """This resource will be used to get a single record """

@@ -1,3 +1,5 @@
+from datetime import datetime
+
 incidents = []
 
 class IncidentModel():
@@ -10,7 +12,27 @@ class IncidentModel():
         return self.data
 
     def get_single_record(self,id):
-        
+        """This method fetches a single record given the id"""
+
         incident = [incident for incident in incidents
                    if incident["id"] == id]
         return incident
+
+
+    def save(self,createdBy,record_type,location,comment ):
+        """This method to create and save a dict object"""
+        
+        id = len(self.data)+1
+        status = 'Draft'
+        date = datetime.now().strftime(("%Y-%m-%d %H:%M:%S"))
+        details = {
+            'id' : id,
+            'createdOn' : date,
+            'createdBy' : createdBy,
+            'type': record_type,
+            'location' : location,
+            'status' : status,
+            'comment' : comment
+        }
+        self.data.append(details)
+        return self.data
