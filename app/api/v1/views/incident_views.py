@@ -35,7 +35,7 @@ class Incident(Resource ,IncidentModel):
             "Status": 201,
              "data":[{
                   "id" : id,  
-                  "message": "created record Successfully"
+                  "message": "created red flag record Successfully"
                  }]
              })
 
