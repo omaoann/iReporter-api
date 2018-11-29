@@ -94,4 +94,73 @@ class SingleRecord(Resource, IncidentModel):
              "Message": "Record can not be deleted"
          })
 
-    
+class EditComment(Resource, IncidentModel):
+
+    def __init__(self):
+        pass
+
+    def patch(self,id):
+        """updates Record data"""
+        resp = self.get_single_record(id)
+
+        if len(resp) == 0:
+
+            return jsonify({
+                "message": "No record with this ID", 
+                "status": 404
+               })
+
+        data = request.get_json()
+
+        comment = data['comment']
+
+        index = self.get_index(id)
+        data = {
+            "comment": comment,
+            "index": index
+        }
+
+        self.update_comment(**data)
+        return jsonify({
+            "status": 200,
+            "data":[{
+                "id": id,
+                "message": "Updated red-flag record's Comment"
+            }]
+            })   
+
+
+class EditLocation(Resource, IncidentModel):
+
+    def __init__(self):
+        pass
+
+    def patch(self,id):
+        """updates Record data"""
+        resp = self.get_single_record(id)
+
+        if len(resp) == 0:
+
+            return jsonify({
+                "message": "No record with this ID", 
+                "status": 404
+               })
+
+        data = request.get_json()
+
+        location = data['location']
+
+        index = self.get_index(id)
+        data = {
+            "location": location,
+            "index": index
+        }
+        
+        self.update_location(**data)
+        return jsonify({
+            "status": 200,
+            "data":[{
+                "id": id,
+                "message": "Updated red-flag record's Location"
+            }]
+            })   

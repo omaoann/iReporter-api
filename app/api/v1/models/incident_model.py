@@ -45,3 +45,31 @@ class IncidentModel():
                    if incident["id"] == id]    
         incident.remove(incident[0])
         return incident  
+
+
+    def update_comment(self, comment, index):
+        """Edit existing record"""
+
+        data = comment
+
+        for comment in incidents:
+            incidents[index]['comment'] = data
+            # return incidents list
+
+    def update_location(self, location, index):
+        """Edit existing record"""
+
+        data = location
+
+        for location in incidents:
+            incidents[index]['location'] = data
+
+    def get_index(self,id):
+        """Get index position of a record"""
+        
+        index = 0
+        for incident in incidents:
+            if incident["id"] == id:
+                return index
+            index += 1
+        return index
