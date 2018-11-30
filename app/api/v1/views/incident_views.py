@@ -2,10 +2,10 @@
 from flask_restful import Resource
 from flask import jsonify, request
 
-from ..models.incident_model import IncidentModel
+from ..models.incident_model import IncidentModel, incidents
 
 class Incident(Resource ,IncidentModel):
-    """This class provides access to operations on Get records """
+    """This class provides access to operations on Get and post records """
     
     def __init__(self):
         self.data = IncidentModel()
@@ -15,10 +15,15 @@ class Incident(Resource ,IncidentModel):
         """This method Fetches all records"""
 
         resp = self.data.get_all_records()
-        return jsonify({
+        if len(resp)== 0:
+             return {
+                 "Status": 404,
+                 "Message": "No records found"
+             },404
+        return {
             "status": 200,
             "Data": resp
-            })
+            },200
 
     def post(self):
         """This method creates a new record"""
@@ -29,78 +34,75 @@ class Incident(Resource ,IncidentModel):
         location = details['location']
         comment = details['comment']
 
+        if not comment or comment=="" or not location :
+            return {"message":"You must provide record details",
+                    "status":400
+                    },400
+
         resp = self.data.save(createdBy,record_type,location,comment)
-        id = resp[0]['id']
-        return jsonify({
-            "Status": 201,
-             "data":[{
-                  "id" : id,  
-                  "message": "created red flag record Successfully"
-                 }]
-             })
+        return {
+                "status": 201,
+                "data": [
+                    {
+                        "id": len(resp),
+                        "message": "created red-flag record"
+                     }
+                ]
+            },201
 
 
 class SingleRecord(Resource, IncidentModel):
-     """This resource will be used to get a single record """
+    """This resource will be used to get a single record """
 
-     def __init__(self):
+    def __init__(self):
         self.db = IncidentModel()
 
-     def get(self,id):
-         """This method gets a single incident record"""
+    def get(self,id):
+        """This method gets a single incident record"""
 
-         if not id or not isinstance(id,int):
-             return jsonify({
-                 "Status": 404,
-                 "Message": "Please Enter a valid ID"
-             })
+        if not id or not isinstance(id,int):
+            return {
+                "Status": 404,
+                "Message": "Please Enter a valid ID"
+            },404
 
-         resp = self.db.get_single_record(id)
-         if len(resp)== 0:
-             return jsonify({
-                 "Status": 404,
-                 "Message": "Record not Found"
-             })
-         return jsonify({
+        resp = self.db.get_single_record(id)
+        if len(resp)== 0:
+            return {
+                "Status": 404,
+                "Message": "Record not Found"
+            },404
+             
+        return {
             "status": 200,
             "Data": resp            
-         })
+        },200
 
 
-     def delete(self,id):
-         """This method delete a record given the Id"""
-             
-         resp = self.db.get_single_record(id)
-
-         if len(resp)==0:
-             return jsonify({
-                 "message": "No record with this ID", 
-                 "status": 404})
-          
-         status = resp [0]['status']
-         id = resp [0]['id']
-
-         if status == "Draft":
-             resp = self.db.delete_record(id)
-             return jsonify({
-                 "Status": 200,
-                 "Data": [{
-                     "id": id,
-                     "Message": "Record deleted successfully"
-                 }]
-             })
-         return jsonify({
-             "Status": 400,
-             "Message": "Record can not be deleted"
-         })
+    def delete(self,id):
+        """This method deletes a record"""
+        record = self.get_single_record(id)
+        if len(record) == 0:
+            return {"message": "No record with this ID", "status": 404},404
+        incidents.remove(record[0])
+        return {
+                "status": 200,
+                "data": [
+                    {
+                        "id": id,
+                        "message": "Red-flag record has been deleted"
+                    }
+                ]
+            },200
 
 class EditComment(Resource, IncidentModel):
+    """This resource will be used to edit a comment"""
 
     def __init__(self):
         pass
 
     def patch(self,id):
-        """updates Record data"""
+        """ This method updates the comment field data"""
         resp = self.get_single_record(id)
 
         if len(resp) == 0:
@@ -131,12 +133,13 @@ class EditComment(Resource, IncidentModel):
 
 
 class EditLocation(Resource, IncidentModel):
+    """This resource will be used to edit location of a record"""
 
     def __init__(self):
         pass
 
     def patch(self,id):
-        """updates Record data"""
+        """Updates record location data"""
         resp = self.get_single_record(id)
 
         if len(resp) == 0:

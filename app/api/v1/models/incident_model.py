@@ -9,6 +9,7 @@ class IncidentModel():
 
 
     def get_all_records(self):
+        """This method fetches all records"""
         return self.data
 
     def get_single_record(self,id):
@@ -22,11 +23,10 @@ class IncidentModel():
     def save(self,createdBy,record_type,location,comment ):
         """This method to create and save a dict object"""
         
-        id = len(self.data)+1
         status = 'Draft'
         date = datetime.now().strftime(("%Y-%m-%d %H:%M:%S"))
         details = {
-            'id' : id,
+            'id' : len(self.data)+1,
             'createdOn' : date,
             'createdBy' : createdBy,
             'type': record_type,
@@ -38,17 +38,8 @@ class IncidentModel():
         return self.data
 
 
-    def delete_record(self,id):
-        """This method deletes a record given the id"""
-
-        incident = [incident for incident in incidents
-                   if incident["id"] == id]    
-        incident.remove(incident[0])
-        return incident  
-
-
     def update_comment(self, comment, index):
-        """Edit existing record"""
+        """This method updates comment record"""
 
         data = comment
 
@@ -57,7 +48,7 @@ class IncidentModel():
             # return incidents list
 
     def update_location(self, location, index):
-        """Edit existing record"""
+        """This method Edits existing location record"""
 
         data = location
 
@@ -65,7 +56,7 @@ class IncidentModel():
             incidents[index]['location'] = data
 
     def get_index(self,id):
-        """Get index position of a record"""
+        """This method gets index position of a record"""
         
         index = 0
         for incident in incidents:
