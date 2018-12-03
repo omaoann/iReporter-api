@@ -18,8 +18,56 @@ class Records(unittest.TestCase):
             "comment" : "bribe taken"
                 }
 
+# tests for user registration
+    def test_all_fields_filled(self):
+        """Test if it returns error if a field is blank """
+
+        response = self.client.post("api/v1/signup", json={
+            "firstname" : "",
+            "lastname" : "omao",
+            "othername" : "kerubo",
+            "email" : "annkay2303@gmail.com",
+            "phonenumber" : "0712345678",
+            "username" : "annkay",
+            "password" : "123456"
+
+        })
+        self.assertEquals(400, response.status_code)
+        self.assertEquals(response.get_json(), {
+            "message":"You must provide all user details", "status": 400
+        })
+
+    def test_user_already_exist(self):
+        """Test if it alerts user if email already exists"""
+        response = self.client.post("api/v1/signup", json={
+            "firstname" : "Ann",
+            "lastname" : "omao",
+            "othername" : "kerubo",
+            "email" : "annkay2303@gmail.com",
+            "phonenumber" : "0712345678",
+            "username" : "annkay",
+            "password" : "123456"
+
+        })
+
+        response = self.client.post("api/v1/signup", json={
+            "firstname" : "Ann",
+            "lastname" : "omao",
+            "othername" : "kerubo",
+            "email" : "annkay2303@gmail.com",
+            "phonenumber" : "0712345678",
+            "username" : "annkay",
+            "password" : "123456"
+
+        })
+        self.assertEquals(response.get_json(),{
+                "Message": "User already exists"})
+        
 
 
+
+
+# tests for red-flags 
     def test_record_does_not_exist(self):
         """Test for when record does not exist during get"""
 
