@@ -4,12 +4,12 @@ class Database():
 
         db1 = """CREATE TABLE IF NOT EXISTS users(
         user_id serial PRIMARY KEY NOT NULL,
-        first_name VARCHAR(50) NOT NULL,
-        other_names VARCHAR(50) NOT NULL,
-        last_name VARCHAR(50) NOT NULL,
+        f_name VARCHAR(50) NOT NULL,
+        o_name VARCHAR(50) NOT NULL,
+        l_name VARCHAR(50) NOT NULL,
         username VARCHAR(50) NOT NULL,
         email VARCHAR(50) NOT NULL UNIQUE,
-        phone_number VARCHAR(13) NOT NULL UNIQUE,
+        phone_no VARCHAR(13) NOT NULL,
         is_admin BOOLEAN NOT NULL DEFAULT FALSE,
         registered timestamp with time zone DEFAULT \
         ('now'::text):: date NOT NULL,
@@ -23,9 +23,10 @@ class Database():
         created_by numeric NOT NULL,
         type VARCHAR(50) NOT NULL,
         location VARCHAR(100) NOT NULL,
-        status VARCHAR(20) NOT NULL DEFAULT Draft,
+        status VARCHAR(20) NOT NULL,
         comment VARCHAR(2000) NOT NULL,
-        user_id INTEGER REFERENCES users(user_id)
+        user_id INTEGER REFERENCES users(user_id) ON DELETE\
+        CASCADE ON UPDATE CASCADE
             )"""
 
         self.queries = [db1,db2] 
@@ -33,7 +34,7 @@ class Database():
     
 
     def drop_query(self):
-        query_users = """DROP TABLE IF EXISTS users"""
-        query_incidents = """DROP TABLE IF EXISTS incident""" 
+        query_users = """DROP TABLE IF EXISTS users CASCADE"""
+        query_incidents = """DROP TABLE IF EXISTS incident CASCADE""" 
         self.queries = [query_users,query_incidents] 
         return self.queries
