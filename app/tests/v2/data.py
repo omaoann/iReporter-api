@@ -1,4 +1,4 @@
-# Registration data
+####Registration data####
 registration_data = {
         'firstname': 'Jane',
         'othername': 'doe',
@@ -26,7 +26,7 @@ reg_invalid_email = {
         'phonenumber': '0711122334',
         'password': '12345'
         }
-# login details
+####login details####
 data_login = {
         'email': 'janedoe@gmail.com',
         'password': '12345'
@@ -47,3 +47,31 @@ login_invalid_email = {
     'email': 'janedoecom',
     'password' : '12345'    
 }
+
+####incidents data####
+record_data= {
+        'type': 'redflag',
+        'location': '-1.223,1.2333',
+        'comment': 'Police officer taking bribes'
+        }
+
+reccord_empty_field= {
+        'type': 'redflag',
+        'location': '-1.223,1.2333',
+        'comment': 'Police officer taking bribes'
+        }
+
+reccord_wrong_location= {
+        'type': 'redflag',
+        'location': '1010,23039',
+        'comment': 'Police officer taking bribes'
+        }
+
+comment= {
+        'comment': 'Roads not good for transportation'
+        }
+
+location= {
+        'location': '-11111,1.11111'
+        }
+

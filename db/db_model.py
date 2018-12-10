@@ -20,10 +20,9 @@ class Database():
         incident_id serial PRIMARY KEY NOT NULL,
         created_on timestamp with time zone DEFAULT\
          ('now'::text):: date NOT NULL,
-        created_by numeric NOT NULL,
         type VARCHAR(50) NOT NULL,
         location VARCHAR(100) NOT NULL,
-        status VARCHAR(20) NOT NULL,
+        status VARCHAR(20) NOT NULL DEFAULT 'Draft',
         comment VARCHAR(2000) NOT NULL,
         user_id INTEGER REFERENCES users(user_id) ON DELETE\
         CASCADE ON UPDATE CASCADE
