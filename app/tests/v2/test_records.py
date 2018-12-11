@@ -30,7 +30,7 @@ class Records(unittest.TestCase):
              headers=dict(Authorization='Bearer '+token),
              content_type="application/json")
         result = json.loads(response2.data)
-        self.assertEqual(result["message"],"Record has been created")
+        self.assertEqual(result["Data"][0]["message"],"Created record successfully")
         self.assertEqual(response2.status_code,201)
 
     def test_empty_field(self):
@@ -74,3 +74,5 @@ class Records(unittest.TestCase):
         result = json.loads(response2.data)
         self.assertEqual(result["message"],"Location does not exist")              
 
+    def tearDown(self):
+        drop_tables()

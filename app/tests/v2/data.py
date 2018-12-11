@@ -50,19 +50,19 @@ login_invalid_email = {
 
 ####incidents data####
 record_data= {
-        'type': 'redflag',
+        'flag_type': 'redflag',
         'location': '-1.223,1.2333',
         'comment': 'Police officer taking bribes'
         }
 
 reccord_empty_field= {
-        'type': 'redflag',
-        'location': '-1.223,1.2333',
+        'flag_type': 'redflag',
+        'location': '',
         'comment': 'Police officer taking bribes'
         }
 
 reccord_wrong_location= {
-        'type': 'redflag',
+        'flag_type': 'redflag',
         'location': '1010,23039',
         'comment': 'Police officer taking bribes'
         }
