@@ -85,11 +85,8 @@ class Users():
                 "message": "Wrong username and password",
                 "status": 400
             },400
-
-        user_identity = {
-            "email": email
-        }
-        access_token = create_access_token(identity=user_identity)
+      
+        access_token = create_access_token(identity=email)
         return {
             "message": "Successfully logged in",
             "token": access_token,

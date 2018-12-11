@@ -18,8 +18,8 @@ class Database():
 
         db2 = """CREATE TABLE IF NOT EXISTS incidents(
         incident_id serial PRIMARY KEY NOT NULL,
-        created_on timestamp with time zone DEFAULT\
-         ('now'::text):: date NOT NULL,
+        created_on TIMESTAMP WITH TIME ZONE DEFAULT \
+         CURRENT_TIMESTAMP NOT NULL,
         type VARCHAR(50) NOT NULL,
         location VARCHAR(100) NOT NULL,
         status VARCHAR(20) NOT NULL DEFAULT 'Draft',
@@ -34,6 +34,6 @@ class Database():
 
     def drop_query(self):
         query_users = """DROP TABLE IF EXISTS users CASCADE"""
-        query_incidents = """DROP TABLE IF EXISTS incident CASCADE""" 
+        query_incidents = """DROP TABLE IF EXISTS incidents CASCADE""" 
         self.queries = [query_users,query_incidents] 
         return self.queries
