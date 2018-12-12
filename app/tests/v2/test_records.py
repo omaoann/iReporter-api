@@ -154,7 +154,7 @@ class Records(unittest.TestCase):
         result = json.loads(response.data)
         self.assertEqual(result["Message"],"Unauthorized request. Can not delete record")        
            
-
+#test that involve admin
     def test_delete_after_status_change(self):
         """Test if user can delete record after status change"""
 
@@ -171,7 +171,72 @@ class Records(unittest.TestCase):
              headers=dict(Authorization='Bearer '+ self.token),
              content_type="application/json")
         result = json.loads(response.data)
-        self.assertEqual(result["Message"],"Record in processing.Can not be deleted")   
+        self.assertEqual(result["Message"],"Record in processing.Can not be deleted") 
+
+    def test_admin_can_change_status(self):
+        """Test admin is able to edit a status record"""
+
+        self.client.post("api/v2/interventions",
+             data=json.dumps(record_data), 
+             headers=dict(Authorization='Bearer '+ self.token),
+             content_type="application/json")
+    
+        response = self.client.patch("api/v2/Intervention/1/status",
+             data=json.dumps(status), 
+             headers=dict(Authorization='Bearer '+ self.token_admin),
+             content_type="application/json")
+        result = json.loads(response.data)
+        self.assertEqual(response.status_code,200)
+        self.assertEqual(result["Data"][0]["Message"],\
+                  "Updated Intervention records status")  
+
+    def test_status_change_of_inexistent_record(self):
+        """Test admin can't change status of an inexistent record"""
+
+        self.client.post("api/v2/interventions",
+             data=json.dumps(record_data), 
+             headers=dict(Authorization='Bearer '+ self.token),
+             content_type="application/json")
+    
+        response = self.client.patch("api/v2/Intervention/15/status",
+             data=json.dumps(status), 
+             headers=dict(Authorization='Bearer '+ self.token_admin),
+             content_type="application/json")
+        result = json.loads(response.data)
+        self.assertEqual(response.status_code,404)
+        self.assertEqual(result["Message"],"Record does not exist")   
+
+    def test_user_cant_change_status(self):
+        """Test a user who is not admin cant edit status"""
+
+        self.client.post("api/v2/interventions",
+             data=json.dumps(record_data), 
+             headers=dict(Authorization='Bearer '+ self.token),
+             content_type="application/json")
+    
+        response = self.client.patch("api/v2/Intervention/1/status",
+             data=json.dumps(status), 
+             headers=dict(Authorization='Bearer '+ self.token),
+             content_type="application/json")
+        result = json.loads(response.data)
+        self.assertEqual(response.status_code,401)
+        self.assertEqual(result["Message"],"Unauthorized user")   
+    
+    def test_change_status_empty_field(self):
+        """Test admin can not patch without inputing a value"""
+
+        self.client.post("api/v2/interventions",
+             data=json.dumps(record_data), 
+             headers=dict(Authorization='Bearer '+ self.token),
+             content_type="application/json")
+    
+        response = self.client.patch("api/v2/Intervention/15/status",
+             data=json.dumps(empty_status), 
+             headers=dict(Authorization='Bearer '+ self.token_admin),
+             content_type="application/json")
+        result = json.loads(response.data)
+        self.assertEqual(response.status_code,400)
+        self.assertEqual(result["Message"],"Please enter required details")   
 
 
     def tearDown(self):

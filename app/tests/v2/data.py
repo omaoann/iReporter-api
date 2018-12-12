@@ -100,5 +100,7 @@ empty_location= {
 status = {
         'status':'Under Investigation'
 }
-
+empty_status = {
+        'status':''
+}
 
