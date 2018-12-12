@@ -1,6 +1,6 @@
 import unittest
 from flask import json
-from app import create_app, create_tables, drop_tables
+from app import create_app, create_tables, drop_tables, create_default_admin
 from .data import (registration_data, empty_reg_data, 
            reg_invalid_email, login_empty_field,login_invalid_name,
            data_login,invalid_password,login_invalid_email)
@@ -12,8 +12,10 @@ class Registration(unittest.TestCase):
     def setUp(self):
         """ Define tests variables"""
         create_tables()
+        create_default_admin()        
         self.app = create_app(config_name='testing')
         self.client = self.app.test_client()
+
 
     def test_user_registered(self):
         response = self.client.post("api/v2/signup", 
