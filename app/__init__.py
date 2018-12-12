@@ -7,11 +7,12 @@ from flask_jwt_extended import (
 from instance.config import app_config
 from .api.v1 import version_one as v1
 from .api.v2 import version_two as v2
-from db.db_config import create_tables, drop_tables
+from db.db_config import create_tables, drop_tables,create_default_admin
 
 def create_app(config_name):
     app = Flask(__name__)
     create_tables()
+    create_default_admin()
     app.config['JWT_SECRET_KEY'] = 'ireportersecret'
     jwt = JWTManager(app)
     

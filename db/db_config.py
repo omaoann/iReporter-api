@@ -37,8 +37,8 @@ def create_tables():
 def create_default_admin():
     """This function creates a default admin"""
 
-    con = connection(url)
-    cursor = con.cursor()
+    con = init_db()
+    cur = con.cursor()
 
     f_name = 'admin'
     o_name = 'admin'
@@ -50,13 +50,14 @@ def create_default_admin():
     is_admin = True 
 
     sql = "SELECT * FROM users WHERE username = %s"
-    cursor.execute(sql, (username,))
-    data = cursor.fetchone()
+    cur.execute(sql, (username,))
+    data = cur.fetchall()
 
     if not data:
-        sql = 'INSERT INTO users(f_name,o_name,l_name,username,email,\
-        phonenumber,is_admin,password) VALUES(%s,%s,%s,%s,%s,%s)'
-        cursor.execute(sql, (f_name,o_name,l_name,username,email,phonenumber,is_admin,password))
+        cur.execute("INSERT INTO users \
+        (f_name,o_name,l_name,username,email,phone_no, password,is_admin)\
+        VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
+        (f_name,o_name,l_name,username,email,phonenumber,password,is_admin))
     close_connection(con)
 
 
