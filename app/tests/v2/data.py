@@ -44,6 +44,10 @@ data_login_1 = {
         'email': 'annkay@gmail.com',
         'password': '456789'
         }
+admin_login = {
+        'email':'admin@gmail.com',
+        'password':'adminstrator'
+}
 login_empty_field = {
         'email': '',
         'password': '12345'
@@ -93,5 +97,8 @@ location= {
 empty_location= {
         'location': ''
         }
+status = {
+        'status':'Under Investigation'
+}
 
 

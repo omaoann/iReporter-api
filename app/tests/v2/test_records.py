@@ -1,6 +1,7 @@
 import unittest
 from flask import json
-from app import create_app, create_tables, drop_tables
+from app import (create_app, create_tables, 
+                   drop_tables,create_default_admin)
 from .data import *
 
 class Records(unittest.TestCase):
@@ -10,6 +11,7 @@ class Records(unittest.TestCase):
     def setUp(self):
         """ Define tests variables"""
         create_tables()
+        create_default_admin()
         self.app = create_app(config_name='testing')
         self.client = self.app.test_client()
         self.signup = self.client.post("api/v2/signup", 
@@ -19,6 +21,10 @@ class Records(unittest.TestCase):
                 data=json.dumps(data_login), 
                 content_type="application/json")
         self.token = json.loads(self.login.data)["token"]
+        self.admin = self.client.post("api/v2/login",
+                data=json.dumps(admin_login), 
+                content_type="application/json")
+        self.token_admin = json.loads(self.admin.data)["token"]
 
     def test_create_incidents(self):
         """This method tests for creation of a new incident"""
@@ -101,7 +107,72 @@ class Records(unittest.TestCase):
         self.assertEqual(response.status_code, 404)
         result = json.loads(response.data)
         self.assertEqual(result["Message"],"Record does not exist")
-                        
+#tests for delete
+    def test_delete_record(self):
+        """Test a user can delete a record"""
+        self.client.post("api/v2/interventions",
+             data=json.dumps(record_data), 
+             headers=dict(Authorization='Bearer '+ self.token),
+             content_type="application/json")
+        response = self.client.delete("api/v2/interventions/1",
+             headers=dict(Authorization='Bearer '+ self.token),
+             content_type="application/json")
+        self.assertEqual(response.status_code, 200)
+        result = json.loads(response.data)
+        self.assertEqual(result["Message"],"Record has been deleted successfully")
+
+    def test_delete_inexistant_record(self):
+        """Test a user can not delete a record which doesn't exist"""
+        self.client.post("api/v2/interventions",
+             data=json.dumps(record_data), 
+             headers=dict(Authorization='Bearer '+ self.token),
+             content_type="application/json")
+        response = self.client.delete("api/v2/interventions/18767",
+             headers=dict(Authorization='Bearer '+ self.token),
+             content_type="application/json")
+        self.assertEqual(response.status_code, 404)
+        result = json.loads(response.data)
+        self.assertEqual(result["Message"],"Record does not exist")  
+
+    def test_delete_other_persons_records(self):
+        """Test a user can not delete a record he did not create"""
+        self.client.post("api/v2/interventions",
+             data=json.dumps(record_data), 
+             headers=dict(Authorization='Bearer '+ self.token),
+             content_type="application/json")    
+        self.client.post("api/v2/signup", 
+                data=json.dumps(registration_data_1),
+                content_type="application/json") 
+        login= self.client.post("api/v2/login",
+                data=json.dumps(data_login_1), 
+                content_type="application/json")
+        token_1 = json.loads(login.data)["token"]
+        response = self.client.delete("api/v2/interventions/1",
+             headers=dict(Authorization='Bearer '+ token_1),
+             content_type="application/json")
+        self.assertEqual(response.status_code, 401)
+        result = json.loads(response.data)
+        self.assertEqual(result["Message"],"Unauthorized request. Can not delete record")        
+           
+
+    def test_delete_after_status_change(self):
+        """Test if user can delete record after status change"""
+
+        self.client.post("api/v2/interventions",
+             data=json.dumps(record_data), 
+             headers=dict(Authorization='Bearer '+ self.token),
+             content_type="application/json")
+    
+        response = self.client.patch("api/v2/Intervention/1/status",
+             data=json.dumps(status), 
+             headers=dict(Authorization='Bearer '+ self.token_admin),
+             content_type="application/json")
+        response = self.client.delete("api/v2/interventions/1", 
+             headers=dict(Authorization='Bearer '+ self.token),
+             content_type="application/json")
+        result = json.loads(response.data)
+        self.assertEqual(result["Message"],"Record in processing.Can not be deleted")   
+
 
     def tearDown(self):
         drop_tables()
