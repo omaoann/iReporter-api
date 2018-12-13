@@ -16,7 +16,11 @@ def connection(url):
 def init_db():
     conn = connection(url)
     return conn
-
+    
+def close_connection(conn):
+    """Closes connection after queries"""
+    conn.commit()
+    conn.close()
 
 def create_tables():
     """Creates the Tables"""
@@ -28,7 +32,34 @@ def create_tables():
 
     for query in queries:        
         cursor.execute(query)
-    con.commit()
+    close_connection(con)
+
+def create_default_admin():
+    """This function creates a default admin"""
+
+    con = init_db()
+    cur = con.cursor()
+
+    f_name = 'admin'
+    o_name = 'admin'
+    l_name = 'admin'
+    username = 'adminuser'
+    email = 'admin@gmail.com'
+    phonenumber = '0711111111'
+    password = 'adminstrator'
+    is_admin = True 
+
+    sql = "SELECT * FROM users WHERE username = %s"
+    cur.execute(sql, (username,))
+    data = cur.fetchall()
+
+    if not data:
+        cur.execute("INSERT INTO users \
+        (f_name,o_name,l_name,username,email,phone_no, password,is_admin)\
+        VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
+        (f_name,o_name,l_name,username,email,phonenumber,password,is_admin))
+    close_connection(con)
+
 
 def drop_tables():
     """Drop tables"""
@@ -41,8 +72,6 @@ def drop_tables():
 
     for query in queries:        
         cursor.execute(query)
-    con.commit()  
+    close_connection(con)
 
 
-if __name__ == "__main__":
-    drop_tables()

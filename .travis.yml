@@ -3,10 +3,14 @@ language: python
  
 python:
 - 3.6
-
+services:
+  - postgresql
 
 install:
 - pip install -r requirements.txt
+
+before_script:
+  - psql -c "CREATE DATABASE ireporter_test;" -U postgres
 
 script:
 - pytest --cov-report term-missing --cov=app
