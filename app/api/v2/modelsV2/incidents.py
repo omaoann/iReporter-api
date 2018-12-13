@@ -1,8 +1,8 @@
 import psycopg2
 import os
+import re
 from db.db_config import init_db,close_connection
 from flask import jsonify, request
-import re
 from flask_jwt_extended import (
     JWTManager, jwt_required, create_access_token,
     get_jwt_identity
@@ -56,3 +56,79 @@ class Record():
             return{
                 "message":"Error while saving record. Please try again"
             }
+
+    @jwt_required
+    def get_record(self):
+        """This methods gets all records"""
+        try:
+            con = init_db()
+            cur = con.cursor()
+            cur.execute("SELECT incident_id, type,location,status,comment, user_id  FROM incidents")
+            data = cur.fetchall() 
+            close_connection(con)
+
+            if not data:
+                return{
+                    "Status": 404,
+                    "Message": "There are no records"
+                },404
+            incidents = []
+
+            for incident in data:
+                incident_dict = {
+                    "incident_id": incident[0],
+                    "flag_type": incident[1],
+                    "loction": incident[2],
+                    "status": incident[3],
+                    "comment": incident[4],
+                    "created_by": incident[5]
+                    }
+                incidents.append(incident_dict)
+            return {
+                "status": 200,
+                "Data":incidents
+                }               
+        except (Exception,psycopg2.DatabaseError) as error:
+            print(error)
+            return{
+                "message":"Can not get any records"
+            }
+
+    @jwt_required
+    def get_single_record(self,id):
+        """This methods gets all records"""
+        try:
+            con = init_db()
+            cur = con.cursor()
+            cur.execute("SELECT incident_id, type,location,status,comment, user_id\
+              FROM incidents WHERE incident_id = %s", (id,))
+            data = cur.fetchall() 
+            close_connection(con)
+
+            if not data:
+                return{
+                    "Status": 404,
+                    "Message": "Record does not exist"
+                },404
+            incidents = []
+
+            for incident in data:
+                incident_dict = {
+                    "incident_id": incident[0],
+                    "flag_type": incident[1],
+                    "loction": incident[2],
+                    "status": incident[3],
+                    "comment": incident[4],
+                    "created_by": incident[5]
+                    }
+                incidents.append(incident_dict)
+            return {
+                "status": 200,
+                "Data":incidents
+                }              
+        except (Exception,psycopg2.DatabaseError) as error:
+            print(error)
+            return{
+                "message":"Can not get any records"
+            }
+
