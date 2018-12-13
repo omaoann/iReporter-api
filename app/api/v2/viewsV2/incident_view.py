@@ -36,3 +36,44 @@ class GetRecord(Resource,Record):
         """Get single record by id"""
         return self.data.get_single_record(id)
 
+    def delete(self,id):
+        """This method deletes a single record"""
+        return self.data.remove_record(id)
+
+class EditComment(Resource,Record):
+    """This class edits a specific comment"""
+    
+    def __init__(self):
+        self.data = Record()
+
+    def patch(self,id):
+        """edit a comment"""
+        details = request.get_json()
+        comment = details['comment']
+
+        if not comment:
+            return{
+                "Status": 400,
+                "Message": "Please enter required details"
+            },400
+
+        return self.data.edit_comment(id,comment)
+
+class EditLocation(Resource,Record):
+    """This class edits a specific comment"""
+    
+    def __init__(self):
+        self.data = Record()
+
+    def patch(self,id):
+        """edit a location"""
+        details = request.get_json()
+        location = details['location']
+
+        if not location:
+            return{
+                "Status": 400,
+                "Message": "Please enter required details"
+            },400
+
+        return self.data.edit_location(id,location)

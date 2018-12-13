@@ -132,3 +132,155 @@ class Record():
                 "message":"Can not get any records"
             }
 
+    @jwt_required
+    def remove_record(self, id):
+        """This method deletes a record for the user currently logged in"""
+
+        current_user = get_jwt_identity()
+        try:
+            con = init_db()
+            cur = con.cursor()
+            cur.execute("SELECT user_id FROM users WHERE email = %s",(current_user,))
+            user = cur.fetchall() 
+            user_id = user[0][0]
+            cur.execute("SELECT user_id,status FROM incidents WHERE incident_id = %s",(id,))
+            user_1 = cur.fetchall()
+
+            if not user_1:
+                return{
+                    "Status": 404,
+                    "Message": "Record does not exist"
+                },404
+
+            user_id_1 = user_1[0][0]
+            if user_id != user_id_1:
+                return{
+                    "Status":401,
+                    "Message": "Unauthorized request. Can not delete record"
+                      },401
+
+            status_type = user_1[0][1]
+            if status_type != "Draft":
+                return{
+                        "Message":"Record in processing.Can not be deleted"
+                       }
+
+            cur.execute("DELETE FROM incidents WHERE incident_id = %s", (id,))
+            close_connection(con)
+            return{
+                "Status": 200,
+                "Message":"Record has been deleted successfully"
+                },200
+        except (Exception,psycopg2.DatabaseError) as error:
+            print(error)
+            return{
+                "message":"Record has not been deleted please try again"
+            } 
+
+    @jwt_required
+    def edit_comment(self,id,comment):
+        """This method edits a single location in a record"""
+
+        current_user = get_jwt_identity()
+        try:
+            con = init_db()
+            cur = con.cursor()
+            cur.execute("SELECT user_id FROM users WHERE email = %s",(current_user,))
+            user = cur.fetchall() 
+            user_id = user[0][0]
+
+            cur.execute("SELECT user_id,status FROM incidents WHERE incident_id = %s",(id,))
+            user_1 = cur.fetchall()
+
+            if not user_1:
+                return{
+                    "Status": 404,
+                    "Message": "Record does not exist"
+                },404
+
+            user_id_1 = user_1[0][0]
+            if user_id != user_id_1:
+                return{
+                    "Status":401,
+                    "Message": "Unauthorized request. Can not edit record"
+                      },401
+            status_type = user_1[0][1]
+            if status_type != "Draft":
+                return{
+                        "Message":"Record in processing.Can not be deleted"
+                       }                      
+            cur.execute("UPDATE incidents SET comment = %s WHERE incident_id = %s\
+             RETURNING incident_id",(comment,id))
+            updated_record = cur.fetchone()
+            record = updated_record[0]
+            close_connection(con)
+            return{
+                "Status": 200,
+                "Data":[{
+                    "Message":"Comment updated successfully",
+                    "Records" :record
+                }]
+            }
+        except (Exception,psycopg2.DatabaseError) as error:
+            print(error)
+            return{
+                "message":"Record has not been edited please try again"
+            } 
+
+
+    @jwt_required
+    def edit_location(self,id,location):
+        """This method edits a single location in a record"""
+
+        valid_location = self.validate_location(location)
+        if valid_location is not True:
+            return valid_location
+
+        current_user = get_jwt_identity()
+        try:
+            con = init_db()
+            cur = con.cursor()
+            cur.execute("SELECT user_id FROM users WHERE email = %s",(current_user,))
+            user = cur.fetchall() 
+            user_id = user[0][0]
+
+            cur.execute("SELECT user_id,status FROM incidents WHERE incident_id = %s",(id,))
+            user_1 = cur.fetchall()
+            print(user_1)
+
+            if not user_1:
+                return{
+                    "Status": 404,
+                    "Message": "Record does not exist"
+                },404
+
+            user_id_1 = user_1[0][0]
+            print(user_id_1)
+            if user_id != user_id_1:
+                return{
+                    "Status":401,
+                    "Message": "Unauthorized request. Can not edit record"
+                      },401
+            status_type = user_1[0][1]
+            print(status_type)
+            if status_type != "Draft":
+                return{
+                        "Message":"Record in processing.Can not be deleted"
+                       }                      
+            cur.execute("UPDATE incidents SET location = %s WHERE incident_id = %s\
+             RETURNING incident_id",(location,id))
+            updated_record = cur.fetchone()
+            record = updated_record[0]
+            close_connection(con)
+            return{
+                "Status": 200,
+                "Data":[{
+                    "Message":"Location updated successfully",
+                    "Records" :record
+                }]
+            }
+        except (Exception,psycopg2.DatabaseError) as error:
+            print(error)
+            return{
+                "message":"Record has not been edited please try again"
+            } 
