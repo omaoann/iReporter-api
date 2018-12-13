@@ -237,8 +237,9 @@ class Records(unittest.TestCase):
         result = json.loads(response.data)
         self.assertEqual(response.status_code,400)
         self.assertEqual(result["Message"],"Please enter required details")   
-
+#edit comments
     def test_user_can_edit_comment(self):
+        """Test whether a user can update a comment successfully"""
         self.client.post("api/v2/interventions",
              data=json.dumps(record_data), 
              headers=dict(Authorization='Bearer '+ self.token),
@@ -253,6 +254,7 @@ class Records(unittest.TestCase):
         self.assertEqual(result["Data"][0]["Message"],"Comment updated successfully")     
 
     def test_edit_other_persons_comment(self):
+        """Test whether user can edit record they did not create"""
         self.client.post("api/v2/interventions",
              data=json.dumps(record_data), 
              headers=dict(Authorization='Bearer '+ self.token),
@@ -306,6 +308,98 @@ class Records(unittest.TestCase):
              content_type="application/json")
         result = json.loads(response.data)
         self.assertEqual(result["Message"],"Record in processing.Can not be deleted")        
+
+#edit location
+    def test_user_can_edit_location(self):
+        """Test whether a user can update location successfully"""
+
+        self.client.post("api/v2/interventions",
+             data=json.dumps(record_data), 
+             headers=dict(Authorization='Bearer '+ self.token),
+             content_type="application/json")
+    
+        response = self.client.patch("api/v2/interventions/1/location",
+             data=json.dumps(location), 
+             headers=dict(Authorization='Bearer '+ self.token),
+             content_type="application/json")
+        #result = json.loads(response.data)
+        self.assertEqual(response.status_code,200)
+        #self.assertEqual(result["Data"][0]["Message"],"Location updated successfully")     
+
+    def test_edit_other_persons_location(self):
+        """Test whether user can edit record they did not create"""
+
+        self.client.post("api/v2/interventions",
+             data=json.dumps(record_data), 
+             headers=dict(Authorization='Bearer '+ self.token),
+             content_type="application/json")    
+        self.client.post("api/v2/signup", 
+                data=json.dumps(registration_data_1),
+                content_type="application/json") 
+        login = self.client.post("api/v2/login",
+                data=json.dumps(data_login_1), 
+                content_type="application/json")
+        token_1 = json.loads(login.data)["token"]
+        response = self.client.patch("api/v2/interventions/1/location",
+             data=json.dumps(location),         
+             headers=dict(Authorization='Bearer '+ token_1),
+             content_type="application/json")
+        #self.assertEqual(response.status_code, 401)
+        result = json.loads(response.data)
+        self.assertEqual(result["Message"],"Unauthorized request. Can not edit record")  
+
+    def test_cant_edit_invalid_id_location(self):
+        """Test edit without data """
+
+        self.client.post("api/v2/interventions",
+             data=json.dumps(record_data), 
+             headers=dict(Authorization='Bearer '+ self.token),
+             content_type="application/json")
+    
+        response = self.client.patch("api/v2/interventions/1/location",
+             data=json.dumps(empty_location), 
+             headers=dict(Authorization='Bearer '+ self.token),
+             content_type="application/json")
+        result = json.loads(response.data)
+        self.assertEqual(response.status_code,400)
+        self.assertEqual(result["Message"],"Please enter required details")     
+
+
+    def test_cant_edit_location_after_status_change(self):
+        """Test if user can edit location after status change"""
+
+        self.client.post("api/v2/interventions",
+             data=json.dumps(record_data), 
+             headers=dict(Authorization='Bearer '+ self.token),
+             content_type="application/json")
+    
+        response = self.client.patch("api/v2/Intervention/1/status",
+             data=json.dumps(status), 
+             headers=dict(Authorization='Bearer '+ self.token_admin),
+             content_type="application/json")
+        response = self.client.patch("api/v2/interventions/1/location", 
+             data=json.dumps(location), 
+             headers=dict(Authorization='Bearer '+ self.token),
+             content_type="application/json")
+        result = json.loads(response.data)
+        print(result)
+        self.assertEqual(result["Message"],"Record in processing.Can not be deleted")   
+
+    def test_invalid_location_details(self):
+        """Test whether user can enter invalid location coordinates"""
+
+        self.client.post("api/v2/interventions",
+             data=json.dumps(record_data), 
+             headers=dict(Authorization='Bearer '+ self.token),
+             content_type="application/json")
+    
+        response = self.client.patch("api/v2/interventions/1/location",
+             data=json.dumps(invalid_location), 
+             headers=dict(Authorization='Bearer '+ self.token),
+             content_type="application/json")
+        result = json.loads(response.data)
+        self.assertEqual(result["message"],"Location does not exist")        
+
 
     def tearDown(self):
         drop_tables()

@@ -92,10 +92,13 @@ empty_comment= {
         }
 
 location= {
-        'location': '-11111,1.11111'
+        'location': '-1.1111,1.11111'
         }
 empty_location= {
         'location': ''
+        }
+invalid_location= {
+        'location': '1002,4000'
         }
 status = {
         'status':'Under Investigation'
