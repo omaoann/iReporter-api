@@ -40,7 +40,6 @@ class Status():
             cur.execute("SELECT email FROM users WHERE user_id = %s",(user,))
             user_email = cur.fetchall()
             email = user_email[0][0]
-            print(email)
 
             cur.execute("UPDATE incidents SET status = %s WHERE \
             incident_id = %s and type = %s \
