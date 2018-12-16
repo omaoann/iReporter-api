@@ -3,7 +3,8 @@ from flask import json
 from app import create_app, create_tables, drop_tables, create_default_admin
 from .data import (registration_data, empty_reg_data, 
            reg_invalid_email, login_empty_field,login_invalid_name,
-           data_login,invalid_password,login_invalid_email)
+           data_login,invalid_password,login_invalid_email,
+           reg_whitespace_field,reg_nonstring_field)
 
 class Registration(unittest.TestCase):
     """This class tests for user registration and login"""
@@ -22,14 +23,14 @@ class Registration(unittest.TestCase):
                 data=json.dumps(registration_data),content_type='application/json')
         result = json.loads(response.data)   
         self.assertEqual(201, response.status_code)  
-        self.assertEqual(result['message'],'User saved')  
+        self.assertEqual(result['message'],'User created successfully.Kindly login')  
 
 
     def test_empty_field(self):
         response = self.client.post("api/v2/signup", 
                 data=json.dumps(empty_reg_data),content_type='application/json')
         result = json.loads(response.data)  
-        self.assertEqual(result['message'],'Please fill all fields')     
+        self.assertEqual(result['message'],'Please fill all required fields')     
         self.assertEqual(400, response.status_code)
         
 
@@ -64,7 +65,25 @@ class Registration(unittest.TestCase):
                                 content_type='application/json')
         result = json.loads(response.data)
         self.assertEqual(result['message'], "Please enter a valid email")
-        self.assertEqual(response.status_code, 400)        
+        self.assertEqual(response.status_code, 400)  
+        
+    def test_user_signup_with_non_string(self):
+        response = self.client.post("/api/v2/signup", 
+                data=json.dumps(reg_nonstring_field),
+                                content_type='application/json')
+        result = json.loads(response.data)
+        self.assertEqual(result['message'], "Please enter a valid First name")
+        self.assertEqual(response.status_code, 400)
+
+    def test_for_whitespace_in_user_registration_input(self):
+        response = self.client.post("/api/v2/signup", 
+                data=json.dumps(reg_whitespace_field),
+                                content_type='application/json')
+        result = json.loads(response.data)
+        self.assertEqual(result['message'], "Field can not contain white space")
+        self.assertEqual(response.status_code, 400)                  
+
+
 
 ############Login Tests###############
 
@@ -86,7 +105,7 @@ class Registration(unittest.TestCase):
             data = json.dumps(login_invalid_name),content_type="application/json")
         result = json.loads(response.data)
         self.assertEqual(response.status_code,400)
-        self.assertEqual(result["message"],"User does not exist")
+        self.assertEqual(result["message"],"Wrong email or password")
 
     def test_wrong_password(self):
         response = self.client.post("api/v2/signup", 
@@ -97,7 +116,7 @@ class Registration(unittest.TestCase):
                 data=json.dumps(invalid_password), content_type="application/json")
         result = json.loads(response1.data)
         self.assertEqual(response1.status_code,400)
-        self.assertEqual(result["message"],"Wrong username and password")
+        self.assertEqual(result["message"],"Wrong email or password")
 
     def test_invalid_login_email(self):
         response = self.client.post("api/v2/login",
