@@ -1,8 +1,5 @@
 from flask import Flask, Blueprint
-from flask_jwt_extended import (
-    JWTManager, jwt_required, create_access_token,
-    get_jwt_identity
-)
+from flask_jwt_extended import JWTManager
 
 from instance.config import app_config
 from .api.v1 import version_one as v1
@@ -13,8 +10,11 @@ def create_app(config_name):
     app = Flask(__name__)
     create_tables()
     create_default_admin()
-    app.config['JWT_SECRET_KEY'] = 'ireportersecret'
+
     jwt = JWTManager(app)
+    app.config['JWT_SECRET_KEY'] = 'ireportersecret' 
+
+    app.url_map.strict_slashes = False
     
     app.register_blueprint(v1)
     app.register_blueprint(v2)
