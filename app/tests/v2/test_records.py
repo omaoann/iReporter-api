@@ -33,7 +33,7 @@ class Records(unittest.TestCase):
              headers=dict(Authorization='Bearer '+ self.token),
              content_type="application/json")
         result = json.loads(response2.data)
-        self.assertEqual(result["Data"][0]["message"],"Created record successfully")
+        self.assertEqual(result["message"],"Created record successfully")
         self.assertEqual(response2.status_code,201)
 
     def test_empty_field(self):
@@ -57,6 +57,17 @@ class Records(unittest.TestCase):
              content_type="application/json")
         result = json.loads(response2.data)
         self.assertEqual(result["message"],"Location does not exist")  
+
+    def test_user_cant_post_new_record_using_whitespace(self):
+        """This method tests if a user has used whitespace in a field"""
+
+        response2 = self.client.post("api/v2/interventions",
+             data=json.dumps(reccord_whitespace_location), 
+             headers=dict(Authorization='Bearer '+ self.token),
+             content_type="application/json")
+        result = json.loads(response2.data)
+        self.assertEqual(result["message"],"Field can not contain white space")
+        self.assertEqual(response2.status_code,400)          
 
 ###test get methods
     def test_get_all_data(self):
@@ -150,7 +161,7 @@ class Records(unittest.TestCase):
         response = self.client.delete("api/v2/interventions/1",
              headers=dict(Authorization='Bearer '+ token_1),
              content_type="application/json")
-        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.status_code, 403)
         result = json.loads(response.data)
         self.assertEqual(result["Message"],"Unauthorized request. Can not delete record")        
            
@@ -187,8 +198,8 @@ class Records(unittest.TestCase):
              content_type="application/json")
         result = json.loads(response.data)
         self.assertEqual(response.status_code,200)
-        self.assertEqual(result["Data"][0]["Message"],\
-                  "Updated Intervention records status")  
+        self.assertEqual(result["Message"],\
+                  "Updated Intervention record status")  
 
     def test_status_change_of_inexistent_record(self):
         """Test admin can't change status of an inexistent record"""
@@ -219,7 +230,7 @@ class Records(unittest.TestCase):
              headers=dict(Authorization='Bearer '+ self.token),
              content_type="application/json")
         result = json.loads(response.data)
-        self.assertEqual(response.status_code,401)
+        self.assertEqual(response.status_code,403)
         self.assertEqual(result["Message"],"Unauthorized user")   
     
     def test_change_status_empty_field(self):
@@ -236,7 +247,24 @@ class Records(unittest.TestCase):
              content_type="application/json")
         result = json.loads(response.data)
         self.assertEqual(response.status_code,400)
-        self.assertEqual(result["Message"],"Please enter required details")   
+        self.assertEqual(result["Message"],"Field can not contain empty string or whitespace")
+
+    def test_change_status_with_whitespace_field(self):
+        """Test admin can not patch using whitespace"""
+
+        self.client.post("api/v2/interventions",
+             data=json.dumps(record_data), 
+             headers=dict(Authorization='Bearer '+ self.token),
+             content_type="application/json")
+    
+        response = self.client.patch("api/v2/Intervention/1/status",
+             data=json.dumps(whitespace_status), 
+             headers=dict(Authorization='Bearer '+ self.token_admin),
+             content_type="application/json")
+        result = json.loads(response.data)
+        self.assertEqual(response.status_code,400)
+        self.assertEqual(result["Message"],"Field can not contain empty string or whitespace") 
+
 #edit comments
     def test_user_can_edit_comment(self):
         """Test whether a user can update a comment successfully"""
@@ -251,7 +279,7 @@ class Records(unittest.TestCase):
              content_type="application/json")
         result = json.loads(response.data)
         self.assertEqual(response.status_code,200)
-        self.assertEqual(result["Data"][0]["Message"],"Comment updated successfully")     
+        self.assertEqual(result["Message"],"Comment updated successfully")     
 
     def test_edit_other_persons_comment(self):
         """Test whether user can edit record they did not create"""
@@ -270,7 +298,7 @@ class Records(unittest.TestCase):
              data=json.dumps(comment),         
              headers=dict(Authorization='Bearer '+ token_1),
              content_type="application/json")
-        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.status_code, 403)
         result = json.loads(response.data)
         self.assertEqual(result["Message"],"Unauthorized request. Can not edit record")  
 
@@ -287,7 +315,7 @@ class Records(unittest.TestCase):
              content_type="application/json")
         result = json.loads(response.data)
         self.assertEqual(response.status_code,400)
-        self.assertEqual(result["Message"],"Please enter required details")     
+        self.assertEqual(result["Message"],"Field can not be empty or contain whitespace")     
 
 
     def test_cant_edit_after_status_change(self):
@@ -307,7 +335,19 @@ class Records(unittest.TestCase):
              headers=dict(Authorization='Bearer '+ self.token),
              content_type="application/json")
         result = json.loads(response.data)
-        self.assertEqual(result["Message"],"Record in processing.Can not be deleted")        
+        self.assertEqual(result["Message"],"Record in processing.Comment can not be updated")
+
+    def test_user_cant_update_comment_using_whitespace(self):
+        """This method tests if a user has used whitespace in a field"""
+
+        response2 = self.client.patch("api/v2/interventions/1/comment",
+             data=json.dumps(whitespace_comment), 
+             headers=dict(Authorization='Bearer '+ self.token),
+             content_type="application/json")
+        result = json.loads(response2.data)
+        print(response2)
+        self.assertEqual(result["Message"],"Field can not be empty or contain whitespace")
+        self.assertEqual(response2.status_code,400)         
 
 #edit location
     def test_user_can_edit_location(self):
@@ -322,9 +362,9 @@ class Records(unittest.TestCase):
              data=json.dumps(location), 
              headers=dict(Authorization='Bearer '+ self.token),
              content_type="application/json")
-        #result = json.loads(response.data)
+        result = json.loads(response.data)
         self.assertEqual(response.status_code,200)
-        #self.assertEqual(result["Data"][0]["Message"],"Location updated successfully")     
+        self.assertEqual(result["Message"],"Location updated successfully")     
 
     def test_edit_other_persons_location(self):
         """Test whether user can edit record they did not create"""
@@ -362,7 +402,7 @@ class Records(unittest.TestCase):
              content_type="application/json")
         result = json.loads(response.data)
         self.assertEqual(response.status_code,400)
-        self.assertEqual(result["Message"],"Please enter required details")     
+        self.assertEqual(result["Message"],"Field can not be empty or contain whitespace")     
 
 
     def test_cant_edit_location_after_status_change(self):
@@ -383,7 +423,7 @@ class Records(unittest.TestCase):
              content_type="application/json")
         result = json.loads(response.data)
         print(result)
-        self.assertEqual(result["Message"],"Record in processing.Can not be deleted")   
+        self.assertEqual(result["Message"],"Record in processing.Location can not be updated")   
 
     def test_invalid_location_details(self):
         """Test whether user can enter invalid location coordinates"""
@@ -398,7 +438,19 @@ class Records(unittest.TestCase):
              headers=dict(Authorization='Bearer '+ self.token),
              content_type="application/json")
         result = json.loads(response.data)
-        self.assertEqual(result["message"],"Location does not exist")        
+        self.assertEqual(result["message"],"Location does not exist") 
+
+    def test_user_cant_update_location_using_whitespace(self):
+        """This method tests if a user has used whitespace in a field"""
+
+        response2 = self.client.patch("api/v2/interventions/1/location",
+             data=json.dumps(whitespace_location), 
+             headers=dict(Authorization='Bearer '+ self.token),
+             content_type="application/json")
+        result = json.loads(response2.data)
+        print(response2)
+        self.assertEqual(result["Message"],"Field can not be empty or contain whitespace")
+        self.assertEqual(response2.status_code,400)         
 
 
     def tearDown(self):

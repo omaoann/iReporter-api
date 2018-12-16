@@ -29,7 +29,7 @@ parser.add_argument(
        help="Username field can not be left blank"
        )
 parser.add_argument(
-    'phonenumber',type=int,
+    'phonenumber',type=str,
        required=True,
        help="Phone number field can not be left blank"
        )   
@@ -68,6 +68,18 @@ class Register(Resource):
             return {'message': 'Please enter a valid Last name'}, 400
         if o_name.isalpha() is False:
             return {'message': 'Please enter a valid other name'}, 400
+
+        if f_name.isspace()==True\
+            or l_name.isspace()==True\
+            or o_name.isspace()==True\
+            or username.isspace()==True\
+            or email.isspace()==True\
+            or phone_no.isspace()==True\
+            or password.isspace()==True:                        
+            return {
+                "message": "Field can not contain white space",
+                "status": 400
+            },400
 
         return self.data.save_user(f_name,o_name,l_name,username,\
                      email,phone_no,password)

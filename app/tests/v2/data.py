@@ -35,6 +35,26 @@ reg_invalid_email = {
         'phonenumber': '0711122334',
         'password': '12345'
         }
+reg_whitespace_field = {
+        'firstname': 'jane',
+        'othername': 'doe',
+        'lastname': 'jose',
+        'username': '      ',
+        'email': 'janedoe@gmail',
+        'phonenumber': '0711122334',
+        'password': '12345'
+        }
+reg_nonstring_field = {
+        'firstname': 'jane1234',
+        'othername': 'doe',
+        'lastname': 'jose',
+        'username': 'janedoe@gmail.com',
+        'email': 'janedoe@gmail',
+        'phonenumber': '0711122334',
+        'password': '12345'
+        }
+
+
 ####login details####
 data_login = {
         'email': 'janedoe@gmail.com',
@@ -84,11 +104,20 @@ reccord_wrong_location= {
         'comment': 'Police officer taking bribes'
         }
 
+reccord_whitespace_location= {
+        'flag_type': '          ',
+        'location': '-1.223,1.2333',
+        'comment': 'Police officer taking bribes'
+        }
+
 comment= {
         'comment': 'Roads not good for transportation'
         }
 empty_comment= {
         'comment': ''
+        }
+whitespace_comment= {
+        'comment': '         '
         }
 
 location= {
@@ -97,6 +126,10 @@ location= {
 empty_location= {
         'location': ''
         }
+whitespace_location= {
+        'location': '           '
+        }
+
 invalid_location= {
         'location': '1002,4000'
         }
@@ -105,5 +138,8 @@ status = {
 }
 empty_status = {
         'status':''
+}
+whitespace_status = {
+        'status':'             '
 }
 
