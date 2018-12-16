@@ -213,7 +213,7 @@ class Record():
             status_type = user_1[0][1]
             if status_type != "Draft":
                 return{
-                        "Message":"Record in processing.Can not be deleted"
+                        "Message":"Record in processing.Comment can not be updated"
                        }                      
             cur.execute("UPDATE incidents SET comment = %s WHERE incident_id = %s\
              RETURNING incident_id,type,location,status,comment,user_id",(comment,id))
@@ -258,7 +258,7 @@ class Record():
 
             cur.execute("SELECT user_id,status FROM incidents WHERE incident_id = %s",(id,))
             user_1 = cur.fetchall()
-            print(user_1)
+            #print(user_1)
 
             if not user_1:
                 return{
@@ -267,7 +267,7 @@ class Record():
                 },404
 
             user_id_1 = user_1[0][0]
-            print(user_id_1)
+            #print(user_id_1)
             if user_id != user_id_1:
                 return{
                     "Status":403,
@@ -277,7 +277,7 @@ class Record():
             print(status_type)
             if status_type != "Draft":
                 return{
-                        "Message":"Record in processing.Can not be deleted"
+                        "Message":"Record in processing.Location can not be updated"
                        }                      
             cur.execute("UPDATE incidents SET location = %s WHERE incident_id = %s\
              RETURNING incident_id,type,location,status,comment,user_id",(location,id))
