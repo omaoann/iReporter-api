@@ -55,7 +55,7 @@ class Users():
                 }
                 close_connection(con)
                 return {
-                    "message": "User saved",
+                    "message": "User created successfully.Kindly login",
                     "User": new_user,
                     "status": 201
                 },201               
