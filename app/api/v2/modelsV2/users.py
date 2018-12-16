@@ -39,18 +39,23 @@ class Users():
                 },400
             else:
                 cur.execute(
-                    "INSERT INTO users(f_name,o_name,l_name,username,email,phone_no, password)\
-                     VALUES (%s,%s,%s,%s,%s,%s,%s) RETURNING user_id, username",
+                    "INSERT INTO users(f_name,o_name,l_name,username,\
+                    email,phone_no, password)VALUES (%s,%s,%s,%s,%s,%s,%s) \
+                    RETURNING user_id, f_name,l_name,username,email,phone_no",
                     (f_name,o_name,l_name,username,email,phone_no,password))
                 user = cur.fetchone() 
 
                 new_user = {
                     "UserId": user[0],
-                    "Username": user[1]
+                    "First name": user[1],
+                    "Last name": user[2],
+                    "Username": user[3],
+                    "Email": user[4],
+                    "Phone Number": user[5]
                 }
                 close_connection(con)
                 return {
-                    "message": "User saved",
+                    "message": "User created successfully.Kindly login",
                     "User": new_user,
                     "status": 201
                 },201               
@@ -75,14 +80,14 @@ class Users():
         close_connection(con)
         if not user_exists:
             return {
-                "message": "User does not exist",
+                "message": "Wrong email or password",
                 "status": 400
             },400
 
         db_password = user_exists[0]
         if db_password != password:
             return {
-                "message": "Wrong username and password",
+                "message": "Wrong email or password",
                 "status": 400
             },400
       
