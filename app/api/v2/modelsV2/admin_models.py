@@ -24,27 +24,35 @@ class Status():
         
             if user_role != True:
                 return{
-                    "Status": 401,
+                    "Status": 403,
                     "Message":"Unauthorized user"            
-                      },401 
-            cur.execute("SELECT * FROM incidents WHERE incident_id = %s AND type = %s",(id,type))
+                      },403 
+            cur.execute("SELECT * FROM incidents WHERE \
+            incident_id = %s AND type = %s",(id,type))
             record = cur.fetchall()
             if not record:
                 return{
                     "Status": 404,
                     "Message": "Record does not exist"
                 },404  
-            cur.execute("UPDATE incidents SET status = %s WHERE incident_id = %s\
-             and type = %s RETURNING incident_id",(status,id,type))
+            cur.execute("UPDATE incidents SET status = %s WHERE \
+            incident_id = %s and type = %s \
+            RETURNING incident_id,type,location,status,comment,user_id",
+            (status,id,type))
             updated_record = cur.fetchone()
             close_connection(con)
-            record_1 = updated_record[0]
+            new_record = {
+                  "Created by":updated_record[5],
+                  "Incident Id":updated_record[0],
+                  "Type":updated_record[1],
+                  "Location":updated_record[2],
+                  "Status":updated_record[3],
+                  "Comment":updated_record[4]
+            }
             return{
                 "Status": 200,
-                "Data":[{
-                    "Message":"Updated " + type + " records status",
-                    "Records" :record_1
-                }]
+                "Message":"Updated " + type + " record status",
+                "Data": new_record
             }
         except (Exception,psycopg2.DatabaseError) as error:
             print(error)

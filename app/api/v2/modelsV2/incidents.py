@@ -37,18 +37,24 @@ class Record():
 
             cur.execute(
                     "INSERT INTO incidents(type,location,comment,user_id)\
-                     VALUES (%s,%s,%s,%s) RETURNING incident_id",
+                     VALUES (%s,%s,%s,%s) RETURNING incident_id,type,location,\
+                     status,comment,user_id",
                     (flag_type,location,comment,user_id))
             incident = cur.fetchone() 
 
-            new_record = incident[0]
+            new_record = {
+                  "Created by":incident[5],
+                  "Incident Id":incident[0],
+                  "Type":incident[1],
+                  "Location":incident[2],
+                  "Status":incident[3],
+                  "Comment":incident[4]
+            }
             close_connection(con)
             return {
                     "status": 201,
-                    "Data":[{
-                        "message": "Created record successfully",
-                        "Id": new_record
-                    }]
+                    "message": "Created record successfully",
+                    "Data": new_record
                 },201               
 
         except (Exception,psycopg2.DatabaseError) as error:
@@ -155,9 +161,9 @@ class Record():
             user_id_1 = user_1[0][0]
             if user_id != user_id_1:
                 return{
-                    "Status":401,
+                    "Status":403,
                     "Message": "Unauthorized request. Can not delete record"
-                      },401
+                      },403
 
             status_type = user_1[0][1]
             if status_type != "Draft":
@@ -201,25 +207,31 @@ class Record():
             user_id_1 = user_1[0][0]
             if user_id != user_id_1:
                 return{
-                    "Status":401,
+                    "Status":403,
                     "Message": "Unauthorized request. Can not edit record"
-                      },401
+                      },403
             status_type = user_1[0][1]
             if status_type != "Draft":
                 return{
                         "Message":"Record in processing.Can not be deleted"
                        }                      
             cur.execute("UPDATE incidents SET comment = %s WHERE incident_id = %s\
-             RETURNING incident_id",(comment,id))
+             RETURNING incident_id,type,location,status,comment,user_id",(comment,id))
             updated_record = cur.fetchone()
-            record = updated_record[0]
+
+            new_record = {
+                  "Created by":updated_record[5],
+                  "Incident Id":updated_record[0],
+                  "Type":updated_record[1],
+                  "Location":updated_record[2],
+                  "Status":updated_record[3],
+                  "Comment":updated_record[4]
+            }
             close_connection(con)
             return{
                 "Status": 200,
-                "Data":[{
-                    "Message":"Comment updated successfully",
-                    "Records" :record
-                }]
+                "Message":"Comment updated successfully",
+                "Data": new_record               
             }
         except (Exception,psycopg2.DatabaseError) as error:
             print(error)
@@ -258,9 +270,9 @@ class Record():
             print(user_id_1)
             if user_id != user_id_1:
                 return{
-                    "Status":401,
+                    "Status":403,
                     "Message": "Unauthorized request. Can not edit record"
-                      },401
+                      },403
             status_type = user_1[0][1]
             print(status_type)
             if status_type != "Draft":
@@ -268,16 +280,21 @@ class Record():
                         "Message":"Record in processing.Can not be deleted"
                        }                      
             cur.execute("UPDATE incidents SET location = %s WHERE incident_id = %s\
-             RETURNING incident_id",(location,id))
+             RETURNING incident_id,type,location,status,comment,user_id",(location,id))
             updated_record = cur.fetchone()
-            record = updated_record[0]
+            new_record = {
+                  "Created by":updated_record[5],
+                  "Incident Id":updated_record[0],
+                  "Type":updated_record[1],
+                  "Location":updated_record[2],
+                  "Status":updated_record[3],
+                  "Comment":updated_record[4]
+            }
             close_connection(con)
             return{
                 "Status": 200,
-                "Data":[{
-                    "Message":"Location updated successfully",
-                    "Records" :record
-                }]
+                "Message":"Location updated successfully",                
+                "Data": new_record
             }
         except (Exception,psycopg2.DatabaseError) as error:
             print(error)
