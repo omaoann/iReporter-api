@@ -20,7 +20,7 @@ parser.add_argument(
        )
 
 class AddRecord(Resource,Record):
-    """This class registers a new user and gets all records"""
+    """This class registers a new user"""
     
     def __init__(self):
         self.data = Record()
@@ -48,9 +48,15 @@ class AddRecord(Resource,Record):
 
         return self.data.add_record(flag_type,location,comment)
 
-    def get(self):
+class GetRecords(Resource,Record):
+    """This class gets all records"""
+    
+    def __init__(self):
+        self.data = Record()
+
+    def get(self,type):
         """Get all records"""
-        return self.data.get_record()
+        return self.data.get_record(type)
 
 class GetRecord(Resource,Record):
     """This class gets a single record and deletes a record"""
@@ -58,13 +64,13 @@ class GetRecord(Resource,Record):
     def __init__(self):
         self.data = Record()
 
-    def get(self,id):
+    def get(self,type,id):
         """Get single record by id"""
-        return self.data.get_single_record(id)
+        return self.data.get_single_record(id,type)
 
-    def delete(self,id):
+    def delete(self,type,id):
         """This method deletes a single record"""
-        return self.data.remove_record(id)
+        return self.data.remove_record(id,type)
 
 parser_c=reqparse.RequestParser(bundle_errors=True)
 parser_c.add_argument(
@@ -78,7 +84,7 @@ class EditComment(Resource,Record):
     def __init__(self):
         self.data = Record()
 
-    def patch(self,id):
+    def patch(self,type,id):
         """edit a comment"""
         details = parser_c.parse_args()
         comment = details['comment']
@@ -89,7 +95,7 @@ class EditComment(Resource,Record):
                 "Message": "Field can not be empty or contain whitespace"
             },400
 
-        return self.data.edit_comment(id,comment)
+        return self.data.edit_comment(id,type,comment)
 
 parser_l=reqparse.RequestParser(bundle_errors=True)
 parser_l.add_argument(
@@ -103,7 +109,7 @@ class EditLocation(Resource,Record):
     def __init__(self):
         self.data = Record()
 
-    def patch(self,id):
+    def patch(self,type,id):
         """edit a location"""
         details = parser_l.parse_args()
         location = details['location']
@@ -114,4 +120,4 @@ class EditLocation(Resource,Record):
                 "Message": "Field can not be empty or contain whitespace"
             },400
 
-        return self.data.edit_location(id,location)
+        return self.data.edit_location(id,type,location)
