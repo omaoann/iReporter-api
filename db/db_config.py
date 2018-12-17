@@ -1,10 +1,15 @@
 import os
 import psycopg2
 from .db_model import Database
+from instance.config import app_config
 
 
-url = "dbname='ireporter_test' host='localhost' \
-     port='5432' user='postgres' password='naivasha_234'"
+env = os.getenv('FLASK_ENV')
+url = app_config[env].DATABASE_URL
+
+
+#url = "dbname='ireporter_test' host='localhost' \
+     #port='5432' user='postgres' password='naivasha_234'"
 
 #url = os.getenv('DATABASE_URL')
 
