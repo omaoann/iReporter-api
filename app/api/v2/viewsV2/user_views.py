@@ -84,6 +84,17 @@ class Register(Resource):
         return self.data.save_user(f_name,o_name,l_name,username,\
                      email,phone_no,password)
 
+parser_l=reqparse.RequestParser(bundle_errors=True)
+parser_l.add_argument(
+    'email',type=str,
+       required=True,
+       help="Email field can not be left blank"
+       )   
+parser_l.add_argument(
+    'password',type=str,
+       required=True,
+       help="Password field can not be left blank"
+       )    
 
 class Login(Resource):
     """This class enables user login"""
@@ -92,7 +103,7 @@ class Login(Resource):
         self.data = Users()
 
     def post(self):
-        details = request.get_json()
+        details = parser_l.parse_args()
         email = details['email']
         password = details['password']
 
@@ -100,6 +111,13 @@ class Login(Resource):
             return{
                 "message":"Please fill all fields",
                 "status":"400"
+            },400
+
+        if email.isspace()==True\
+            or password.isspace()==True:
+            return {
+                "message": "Field can not contain white space",
+                "status": 400
             },400
 
         return self.data.user_login(email,password)
