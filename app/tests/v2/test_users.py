@@ -19,7 +19,7 @@ class Registration(unittest.TestCase):
 
 
     def test_user_registered(self):
-        response = self.client.post("api/v2/signup", 
+        response = self.client.post("api/v2/auth/signup", 
                 data=json.dumps(registration_data),content_type='application/json')
         result = json.loads(response.data)   
         self.assertEqual(201, response.status_code)  
@@ -27,7 +27,7 @@ class Registration(unittest.TestCase):
 
 
     def test_empty_field(self):
-        response = self.client.post("api/v2/signup", 
+        response = self.client.post("api/v2/auth/signup", 
                 data=json.dumps(empty_reg_data),content_type='application/json')
         result = json.loads(response.data)  
         self.assertEqual(result['message'],'Please fill all required fields')     
@@ -35,12 +35,12 @@ class Registration(unittest.TestCase):
         
 
     def test_email_exist(self):
-        response = self.client.post("api/v2/signup", 
+        response = self.client.post("api/v2/auth/signup", 
                 data=json.dumps(registration_data),
                 content_type="application/json")  
         self.assertEqual(201, response.status_code)  
 
-        response1 = self.client.post("api/v2/signup", 
+        response1 = self.client.post("api/v2/auth/signup", 
                 data=json.dumps(registration_data),
                 content_type='application/json') 
         result = json.loads(response1.data)  
@@ -48,19 +48,19 @@ class Registration(unittest.TestCase):
         
 
     def test_username_exist(self):
-        response = self.client.post("api/v2/signup", 
+        response = self.client.post("api/v2/auth/signup", 
                 data=json.dumps(registration_data),
                 content_type='application/json')   
         self.assertEqual(201, response.status_code)
 
-        response1 = self.client.post("api/v2/signup", 
+        response1 = self.client.post("api/v2/auth/signup", 
                 data=json.dumps(registration_data),
                 content_type='application/json') 
         result = json.loads(response1.data)  
         self.assertEqual(result['message'], "User already exists")
 
     def test_email_is_invalid(self):
-        response = self.client.post("/api/v2/signup", 
+        response = self.client.post("/api/v2/auth/signup", 
                 data=json.dumps(reg_invalid_email),
                                 content_type='application/json')
         result = json.loads(response.data)
@@ -68,7 +68,7 @@ class Registration(unittest.TestCase):
         self.assertEqual(response.status_code, 400)  
         
     def test_user_signup_with_non_string(self):
-        response = self.client.post("/api/v2/signup", 
+        response = self.client.post("/api/v2/auth/signup", 
                 data=json.dumps(reg_nonstring_field),
                                 content_type='application/json')
         result = json.loads(response.data)
@@ -76,7 +76,7 @@ class Registration(unittest.TestCase):
         self.assertEqual(response.status_code, 400)
 
     def test_for_whitespace_in_user_registration_input(self):
-        response = self.client.post("/api/v2/signup", 
+        response = self.client.post("/api/v2/auth/signup", 
                 data=json.dumps(reg_whitespace_field),
                                 content_type='application/json')
         result = json.loads(response.data)
@@ -88,12 +88,12 @@ class Registration(unittest.TestCase):
 ############Login Tests###############
 
     def test_user_login(self):
-        response = self.client.post("api/v2/signup", 
+        response = self.client.post("api/v2/auth/signup", 
                 data=json.dumps(registration_data),
                 content_type="application/json")           
         self.assertEqual(response.status_code,201)
 
-        response1 = self.client.post("api/v2/login",
+        response1 = self.client.post("api/v2/auth/login",
                 data=json.dumps(data_login), 
                 content_type="application/json")
         result = json.loads(response1.data)
@@ -101,32 +101,32 @@ class Registration(unittest.TestCase):
         self.assertEqual(result['message'],"Successfully logged in")
 
     def test_unregistered_user(self):
-        response = self.client.post("api/v2/login",
+        response = self.client.post("api/v2/auth/login",
             data = json.dumps(login_invalid_name),content_type="application/json")
         result = json.loads(response.data)
         self.assertEqual(response.status_code,400)
         self.assertEqual(result["message"],"Wrong email or password")
 
     def test_wrong_password(self):
-        response = self.client.post("api/v2/signup", 
+        response = self.client.post("api/v2/auth/signup", 
                 data=json.dumps(registration_data),content_type="application/json")           
         self.assertEqual(response.status_code,201)
 
-        response1 = self.client.post("api/v2/login",
+        response1 = self.client.post("api/v2/auth/login",
                 data=json.dumps(invalid_password), content_type="application/json")
         result = json.loads(response1.data)
         self.assertEqual(response1.status_code,400)
         self.assertEqual(result["message"],"Wrong email or password")
 
     def test_invalid_login_email(self):
-        response = self.client.post("api/v2/login",
+        response = self.client.post("api/v2/auth/login",
             data = json.dumps(login_invalid_email),content_type="application/json")
         result = json.loads(response.data)
         self.assertEqual(response.status_code,400)
         self.assertEqual(result["message"],"Please enter a valid email")
 
     def test_empty_login_field(self):
-        response = self.client.post("api/v2/login", 
+        response = self.client.post("api/v2/auth/login", 
                 data=json.dumps(login_empty_field),content_type='application/json')
         result = json.loads(response.data)  
         self.assertEqual(result['message'],'Please fill all fields')     

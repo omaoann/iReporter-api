@@ -14,14 +14,14 @@ class Records(unittest.TestCase):
         create_default_admin()
         self.app = create_app(config_name='testing')
         self.client = self.app.test_client()
-        self.signup = self.client.post("api/v2/signup", 
+        self.signup = self.client.post("api/v2/auth/signup", 
                 data=json.dumps(registration_data),
                 content_type="application/json") 
-        self.login = self.client.post("api/v2/login",
+        self.login = self.client.post("api/v2/auth/login",
                 data=json.dumps(data_login), 
                 content_type="application/json")
         self.token = json.loads(self.login.data)["token"]
-        self.admin = self.client.post("api/v2/login",
+        self.admin = self.client.post("api/v2/auth/login",
                 data=json.dumps(admin_login), 
                 content_type="application/json")
         self.token_admin = json.loads(self.admin.data)["token"]
@@ -81,7 +81,7 @@ class Records(unittest.TestCase):
              data=json.dumps(record_data), 
              headers=dict(Authorization='Bearer '+ self.token),
              content_type="application/json")
-        response = self.client.get("api/v2/interventions",
+        response = self.client.get("api/v2/Intervention",
              headers=dict(Authorization='Bearer '+ self.token),
              content_type="application/json")
         self.assertEqual(response.status_code, 200)
@@ -92,14 +92,14 @@ class Records(unittest.TestCase):
              data=json.dumps(record_data), 
              headers=dict(Authorization='Bearer '+ self.token),
              content_type="application/json")
-        response = self.client.get("api/v2/interventions/1",
+        response = self.client.get("api/v2/Intervention/1",
              headers=dict(Authorization='Bearer '+ self.token),
              content_type="application/json")
         self.assertEqual(response.status_code, 200)
             
     def test_get_empty_list(self):
         """Test it returns error message if no records exist"""  
-        response = self.client.get("api/v2/interventions",
+        response = self.client.get("api/v2/Intervention",
              headers=dict(Authorization='Bearer '+ self.token),
              content_type="application/json")
         self.assertEqual(response.status_code, 404)
@@ -112,7 +112,7 @@ class Records(unittest.TestCase):
              data=json.dumps(record_data), 
              headers=dict(Authorization='Bearer '+ self.token),
              content_type="application/json")
-        response = self.client.get("api/v2/interventions/16781",
+        response = self.client.get("api/v2/Intervention/16781",
              headers=dict(Authorization='Bearer '+ self.token),
              content_type="application/json")
         self.assertEqual(response.status_code, 404)
@@ -125,7 +125,7 @@ class Records(unittest.TestCase):
              data=json.dumps(record_data), 
              headers=dict(Authorization='Bearer '+ self.token),
              content_type="application/json")
-        response = self.client.delete("api/v2/interventions/1",
+        response = self.client.delete("api/v2/Intervention/1",
              headers=dict(Authorization='Bearer '+ self.token),
              content_type="application/json")
         self.assertEqual(response.status_code, 200)
@@ -138,7 +138,7 @@ class Records(unittest.TestCase):
              data=json.dumps(record_data), 
              headers=dict(Authorization='Bearer '+ self.token),
              content_type="application/json")
-        response = self.client.delete("api/v2/interventions/18767",
+        response = self.client.delete("api/v2/Intervention/18767",
              headers=dict(Authorization='Bearer '+ self.token),
              content_type="application/json")
         self.assertEqual(response.status_code, 404)
@@ -151,14 +151,14 @@ class Records(unittest.TestCase):
              data=json.dumps(record_data), 
              headers=dict(Authorization='Bearer '+ self.token),
              content_type="application/json")    
-        self.client.post("api/v2/signup", 
+        self.client.post("api/v2/auth/signup", 
                 data=json.dumps(registration_data_1),
                 content_type="application/json") 
-        login= self.client.post("api/v2/login",
+        login= self.client.post("api/v2/auth/login",
                 data=json.dumps(data_login_1), 
                 content_type="application/json")
         token_1 = json.loads(login.data)["token"]
-        response = self.client.delete("api/v2/interventions/1",
+        response = self.client.delete("api/v2/Intervention/1",
              headers=dict(Authorization='Bearer '+ token_1),
              content_type="application/json")
         self.assertEqual(response.status_code, 403)
@@ -178,7 +178,7 @@ class Records(unittest.TestCase):
              data=json.dumps(status), 
              headers=dict(Authorization='Bearer '+ self.token_admin),
              content_type="application/json")
-        response = self.client.delete("api/v2/interventions/1", 
+        response = self.client.delete("api/v2/Intervention/1", 
              headers=dict(Authorization='Bearer '+ self.token),
              content_type="application/json")
         result = json.loads(response.data)
@@ -273,7 +273,7 @@ class Records(unittest.TestCase):
              headers=dict(Authorization='Bearer '+ self.token),
              content_type="application/json")
     
-        response = self.client.patch("api/v2/interventions/1/comment",
+        response = self.client.patch("api/v2/Intervention/1/comment",
              data=json.dumps(comment), 
              headers=dict(Authorization='Bearer '+ self.token),
              content_type="application/json")
@@ -287,14 +287,14 @@ class Records(unittest.TestCase):
              data=json.dumps(record_data), 
              headers=dict(Authorization='Bearer '+ self.token),
              content_type="application/json")    
-        self.client.post("api/v2/signup", 
+        self.client.post("api/v2/auth/signup", 
                 data=json.dumps(registration_data_1),
                 content_type="application/json") 
-        login= self.client.post("api/v2/login",
+        login= self.client.post("api/v2/auth/login",
                 data=json.dumps(data_login_1), 
                 content_type="application/json")
         token_1 = json.loads(login.data)["token"]
-        response = self.client.patch("api/v2/interventions/1/comment",
+        response = self.client.patch("api/v2/Intervention/1/comment",
              data=json.dumps(comment),         
              headers=dict(Authorization='Bearer '+ token_1),
              content_type="application/json")
@@ -309,7 +309,7 @@ class Records(unittest.TestCase):
              headers=dict(Authorization='Bearer '+ self.token),
              content_type="application/json")
     
-        response = self.client.patch("api/v2/interventions/1/comment",
+        response = self.client.patch("api/v2/Intervention/1/comment",
              data=json.dumps(empty_comment), 
              headers=dict(Authorization='Bearer '+ self.token),
              content_type="application/json")
@@ -330,7 +330,7 @@ class Records(unittest.TestCase):
              data=json.dumps(status), 
              headers=dict(Authorization='Bearer '+ self.token_admin),
              content_type="application/json")
-        response = self.client.patch("api/v2/interventions/1/comment", 
+        response = self.client.patch("api/v2/Intervention/1/comment", 
              data=json.dumps(comment), 
              headers=dict(Authorization='Bearer '+ self.token),
              content_type="application/json")
@@ -340,7 +340,7 @@ class Records(unittest.TestCase):
     def test_user_cant_update_comment_using_whitespace(self):
         """This method tests if a user has used whitespace in a field"""
 
-        response2 = self.client.patch("api/v2/interventions/1/comment",
+        response2 = self.client.patch("api/v2/Intervention/1/comment",
              data=json.dumps(whitespace_comment), 
              headers=dict(Authorization='Bearer '+ self.token),
              content_type="application/json")
@@ -358,7 +358,7 @@ class Records(unittest.TestCase):
              headers=dict(Authorization='Bearer '+ self.token),
              content_type="application/json")
     
-        response = self.client.patch("api/v2/interventions/1/location",
+        response = self.client.patch("api/v2/Intervention/1/location",
              data=json.dumps(location), 
              headers=dict(Authorization='Bearer '+ self.token),
              content_type="application/json")
@@ -373,14 +373,14 @@ class Records(unittest.TestCase):
              data=json.dumps(record_data), 
              headers=dict(Authorization='Bearer '+ self.token),
              content_type="application/json")    
-        self.client.post("api/v2/signup", 
+        self.client.post("api/v2/auth/signup", 
                 data=json.dumps(registration_data_1),
                 content_type="application/json") 
-        login = self.client.post("api/v2/login",
+        login = self.client.post("api/v2/auth/login",
                 data=json.dumps(data_login_1), 
                 content_type="application/json")
         token_1 = json.loads(login.data)["token"]
-        response = self.client.patch("api/v2/interventions/1/location",
+        response = self.client.patch("api/v2/Intervention/1/location",
              data=json.dumps(location),         
              headers=dict(Authorization='Bearer '+ token_1),
              content_type="application/json")
@@ -396,7 +396,7 @@ class Records(unittest.TestCase):
              headers=dict(Authorization='Bearer '+ self.token),
              content_type="application/json")
     
-        response = self.client.patch("api/v2/interventions/1/location",
+        response = self.client.patch("api/v2/Intervention/1/location",
              data=json.dumps(empty_location), 
              headers=dict(Authorization='Bearer '+ self.token),
              content_type="application/json")
@@ -417,7 +417,7 @@ class Records(unittest.TestCase):
              data=json.dumps(status), 
              headers=dict(Authorization='Bearer '+ self.token_admin),
              content_type="application/json")
-        response = self.client.patch("api/v2/interventions/1/location", 
+        response = self.client.patch("api/v2/Intervention/1/location", 
              data=json.dumps(location), 
              headers=dict(Authorization='Bearer '+ self.token),
              content_type="application/json")
@@ -433,7 +433,7 @@ class Records(unittest.TestCase):
              headers=dict(Authorization='Bearer '+ self.token),
              content_type="application/json")
     
-        response = self.client.patch("api/v2/interventions/1/location",
+        response = self.client.patch("api/v2/Intervention/1/location",
              data=json.dumps(invalid_location), 
              headers=dict(Authorization='Bearer '+ self.token),
              content_type="application/json")
@@ -443,7 +443,7 @@ class Records(unittest.TestCase):
     def test_user_cant_update_location_using_whitespace(self):
         """This method tests if a user has used whitespace in a field"""
 
-        response2 = self.client.patch("api/v2/interventions/1/location",
+        response2 = self.client.patch("api/v2/Intervention/1/location",
              data=json.dumps(whitespace_location), 
              headers=dict(Authorization='Bearer '+ self.token),
              content_type="application/json")
