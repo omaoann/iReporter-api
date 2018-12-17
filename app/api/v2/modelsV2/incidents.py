@@ -64,12 +64,13 @@ class Record():
             }
 
     @jwt_required
-    def get_record(self):
+    def get_record(self,type):
         """This methods gets all records"""
         try:
             con = init_db()
             cur = con.cursor()
-            cur.execute("SELECT incident_id, type,location,status,comment, user_id  FROM incidents")
+            cur.execute("SELECT incident_id, type,location,status,comment,\
+             user_id  FROM incidents WHERE type = %s",(type,))
             data = cur.fetchall() 
             close_connection(con)
 
@@ -101,13 +102,13 @@ class Record():
             }
 
     @jwt_required
-    def get_single_record(self,id):
+    def get_single_record(self,id,type):
         """This methods gets all records"""
         try:
             con = init_db()
             cur = con.cursor()
             cur.execute("SELECT incident_id, type,location,status,comment, user_id\
-              FROM incidents WHERE incident_id = %s", (id,))
+              FROM incidents WHERE incident_id = %s AND type = %s", (id,type))
             data = cur.fetchall() 
             close_connection(con)
 
@@ -139,7 +140,7 @@ class Record():
             }
 
     @jwt_required
-    def remove_record(self, id):
+    def remove_record(self,id,type):
         """This method deletes a record for the user currently logged in"""
 
         current_user = get_jwt_identity()
@@ -149,7 +150,8 @@ class Record():
             cur.execute("SELECT user_id FROM users WHERE email = %s",(current_user,))
             user = cur.fetchall() 
             user_id = user[0][0]
-            cur.execute("SELECT user_id,status FROM incidents WHERE incident_id = %s",(id,))
+            cur.execute("SELECT user_id,status FROM incidents\
+             WHERE incident_id = %s AND type = %s",(id,type))
             user_1 = cur.fetchall()
 
             if not user_1:
@@ -184,7 +186,7 @@ class Record():
             } 
 
     @jwt_required
-    def edit_comment(self,id,comment):
+    def edit_comment(self,id,type,comment):
         """This method edits a single location in a record"""
 
         current_user = get_jwt_identity()
@@ -195,7 +197,8 @@ class Record():
             user = cur.fetchall() 
             user_id = user[0][0]
 
-            cur.execute("SELECT user_id,status FROM incidents WHERE incident_id = %s",(id,))
+            cur.execute("SELECT user_id,status FROM incidents\
+             WHERE incident_id = %s and type = %s",(id,type))
             user_1 = cur.fetchall()
 
             if not user_1:
@@ -241,7 +244,7 @@ class Record():
 
 
     @jwt_required
-    def edit_location(self,id,location):
+    def edit_location(self,id,type,location):
         """This method edits a single location in a record"""
 
         valid_location = self.validate_location(location)
@@ -256,7 +259,8 @@ class Record():
             user = cur.fetchall() 
             user_id = user[0][0]
 
-            cur.execute("SELECT user_id,status FROM incidents WHERE incident_id = %s",(id,))
+            cur.execute("SELECT user_id,status FROM incidents\
+             WHERE incident_id = %s and type = %s",(id,type))
             user_1 = cur.fetchall()
             #print(user_1)
 
